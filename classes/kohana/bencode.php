@@ -1,6 +1,6 @@
-<?php
+<?php defined('SYSPATH') or die('No direct script access.');
 
-class Lightbenc
+class Kohana_Bencode
 {
     public static function bdecode($s, &$pos=0)
     {
