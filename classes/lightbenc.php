@@ -125,16 +125,18 @@ class Lightbenc{
     public static function bencode(&$d){
         if(is_array($d)){
             $ret="l";
-            if($d["isDct"]){
-                $isDict=1;
+            $isDict = (bool)$d["isDct"];
+
+            if($isDict)
+            {
+                unset($d['isDct']);
                 $ret="d";
                 // this is required by the specs, and BitTornado actualy chokes on unsorted dictionaries
                 ksort($d, SORT_STRING);
             }
+
             foreach($d as $key=>$value) {
                 if($isDict){
-                    // skip the isDct element, only if it's set by us
-                    if($key=="isDct" and is_bool($value)) continue;
                     $ret.=strlen($key).":".$key;
                 }
                 if (is_int($value) || is_float($value)){
