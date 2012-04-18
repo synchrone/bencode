@@ -78,8 +78,8 @@ class Lightbenc{
             $pos++;
             $retval=array();
             while ($s[$pos]!='e'){
-                $key=Lightbenc::bdecode($s, $pos);
-                $val=Lightbenc::bdecode($s, $pos);
+                $key=self::bdecode($s, $pos);
+                $val=self::bdecode($s, $pos);
                 if ($key===null || $val===null)
                     break;
                 $retval[$key]=$val;
@@ -92,7 +92,7 @@ class Lightbenc{
             $pos++;
             $retval=array();
             while ($s[$pos]!='e'){
-                $val=Lightbenc::bdecode($s, $pos);
+                $val=self::bdecode($s, $pos);
                 if ($val===null)
                     break;
                 $retval[]=$val;
@@ -120,7 +120,6 @@ class Lightbenc{
             //echo "pos: $pos str: [$str] len: $len digits: $digits\n";
             return (string)$str;
         }
-        return null;
     }
 
     public static function bencode(&$d){
@@ -143,7 +142,7 @@ class Lightbenc{
                 }else if (is_string($value)) {
                     $ret.=strlen($value).":".$value;
                 } else {
-                    $ret.=Lightbenc::bencode ($value);
+                    $ret.=self::bencode ($value);
                 }
             }
             return $ret."e";
@@ -157,12 +156,12 @@ class Lightbenc{
 
     public static function bdecode_file($filename){
         $f=file_get_contents($filename, FILE_BINARY);
-        return Lightbenc::bdecode($f);
+        return self::bdecode($f);
     }
 
-    public static function bdecode_getinfo($filename){
-        $t = Lightbenc::bdecode(file_get_contents($filename, FILE_BINARY));
-        $t['info_hash'] = sha1(Lightbenc::bencode($t['info']));
+    public static function bdecode_getinfo($filename,$need_info_hash = false){
+        $t = self::bdecode_file($filename);
+        $t['info_hash'] = $need_info_hash ? sha1(self::bencode($t['info'])) : null;
 
         if(is_array($t['info']['files'])){ //multifile
             $t['info']['size'] = 0;
