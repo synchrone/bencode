@@ -1,74 +1,76 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php defined('SYSPATH') OR die('No direct script access.');
 
 class Kohana_Bencode
 {
-    public static function bdecode($s, &$pos=0)
-    {
-        if($pos>=strlen($s))
-        {
-            return null;
-        }
+	public static function bdecode($s, & $pos = 0)
+	{
+		if ($pos >= strlen($s)){
+			return NULL;
+		}
 
-        switch($s[$pos])
-        {
-            case 'd':
-                $pos++;
-                $retval=array();
-                while ($s[$pos]!='e'){
-                    $key=self::bdecode($s, $pos);
-                    $val=self::bdecode($s, $pos);
-                    if ($key===null || $val===null)
-                        break;
-                    $retval[$key]=$val;
-                }
-                $retval['isDct']=true;
-                $pos++;
-                return $retval;
+		switch ($s[$pos]) {
+			case 'd':
+				$pos ++;
+				$retval = array();
+				while ($s[$pos] != 'e'){
+					$key = self::bdecode($s, $pos);
+					$val = self::bdecode($s, $pos);
+					if ($key === NULL || $val === NULL){
+						break;
+					}
+					$retval[$key] = $val;
+				}
+				$retval['isDct'] = TRUE;
+				$pos ++;
+				return $retval;
 
-            case 'l':
-                $pos++;
-                $retval=array();
-                while ($s[$pos]!='e'){
-                    $val=self::bdecode($s, $pos);
-                    if ($val===null)
-                        break;
-                    $retval[]=$val;
-                }
-                $pos++;
-                return $retval;
+			case 'l':
+				$pos ++;
+				$retval = array();
+				while ($s[$pos] != 'e'){
+					$val = self::bdecode($s, $pos);
+					if ($val === NULL){
+						break;
+					}
+					$retval[] = $val;
+				}
+				$pos ++;
+				return $retval;
 
-            case 'i':
-                $pos++;
-                $digits=strpos($s, 'e', $pos)-$pos;
-                $val=round((float)substr($s, $pos, $digits));
-                $pos+=$digits+1;
-                return $val;
+			case 'i':
+				$pos ++;
+				$digits = strpos($s, 'e', $pos) - $pos;
+				$val    = round( (float) substr($s, $pos, $digits));
+				$pos += $digits + 1;
+				return $val;
 
-            default:
-                $digits=strpos($s, ':', $pos)-$pos;
-                if ($digits<0 || $digits >20)
-                    return null;
-                $len=(int)substr($s, $pos, $digits);
-                $pos+=$digits+1;
-                $str=substr($s, $pos, $len);
-                $pos+=$len;
-                return (string)$str;
-        }
+			default:
+				$digits = strpos($s, ':', $pos) - $pos;
+				if ($digits < 0 || $digits > 20){
+					return NULL;
+				}
+				$len = (int) substr($s, $pos, $digits);
+				$pos += $digits + 1;
+				$str = substr($s, $pos, $len);
+				$pos += $len;
+				return (string) $str;
+		}
     }
 
-    public static function bencode(&$d){
-        if(is_array($d)){
+    public static function bencode( & $d)
+    {
+        if (is_array($d)){
             $ret='l';
-            $isDict = (bool)$d['isDct'];
-            if($isDict){
+            $is_dict = (bool) $d['isDct'];
+            if ($is_dict){
                 unset($d['isDct']);
                 $ret='d';
                 // this is required by the specs, and BitTornado actualy chokes on unsorted dictionaries
                 ksort($d, SORT_STRING);
             }
 
-            foreach($d as $key=>$value) {
-                if($isDict)
+            foreach ($d as $key=>$value) {
+                if ($is_dict)
                 {
                     $ret .= strlen($key).':'.$key;
                 }
@@ -77,7 +79,7 @@ class Kohana_Bencode
                 {
                     $ret .= sprintf('i%de',$value);
                 }
-                else if (is_string($value))
+                elseif (is_string($value))
                 {
                     $ret .= strlen($value).':'.$value;
                 }
@@ -98,7 +100,7 @@ class Kohana_Bencode
         }
         else
         {
-            return null;
+            return NULL;
         }
     }
 
@@ -108,17 +110,17 @@ class Kohana_Bencode
         return self::bdecode($f);
     }
 
-    public static function bdecode_getinfo($filename,$need_info_hash = false)
+    public static function bdecode_getinfo($filename,$need_info_hash = FALSE)
     {
         $t = self::bdecode_file($filename);
-        $t['info_hash'] = $need_info_hash ? sha1(self::bencode($t['info'])) : null;
+        $t['info_hash'] = $need_info_hash ? sha1(self::bencode($t['info'])) : NULL;
 
-        if(is_array($t['info']['files'])) //multifile
-        {
+        if (is_array($t['info']['files']))
+        { // multifile
             $t['info']['size'] = 0;
             $t['info']['filecount'] = 0;
 
-            foreach($t['info']['files'] as $file)
+            foreach ($t['info']['files'] as $file)
             {
                 $t['info']['filecount']++;
                 $t['info']['size']+=$file['length'];
