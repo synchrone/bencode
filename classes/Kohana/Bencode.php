@@ -115,7 +115,7 @@ class Kohana_Bencode
         $t = self::bdecode_file($filename);
         $t['info_hash'] = $need_info_hash ? sha1(self::bencode($t['info'])) : NULL;
 
-        if (is_array($t['info']['files']))
+        if (isset($t['info']['files']) && is_array($t['info']['files']))
         { // multifile
             $t['info']['size'] = 0;
             $t['info']['filecount'] = 0;
