@@ -57,7 +57,7 @@ class Kohana_Bencode
 		}
     }
 
-    public static function bencode( & $d)
+    public static function bencode($d)
     {
         if (is_array($d)){
             $ret='l';
