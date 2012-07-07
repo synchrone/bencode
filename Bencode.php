@@ -1,6 +1,6 @@
 <?php
 
-class Lightbenc
+class Bencode
 {
 	public static function bdecode($s, & $pos = 0)
 	{
