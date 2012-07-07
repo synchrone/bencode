@@ -61,9 +61,20 @@ class Kohana_Bencode
     {
         if (is_array($d)){
             $ret='l';
-            $is_dict = (bool) $d['isDct'];
-            if ($is_dict){
+            $is_dict = false;
+            if(!isset($d['isDct'])){
+                foreach (array_keys($d) as $key) {
+                    if (!is_int($key)) {
+                        $is_dict = true;
+                        break;
+                    }
+                }
+            }else{
+                $is_dict = (bool) $d['isDct'];
                 unset($d['isDct']);
+            }
+
+            if($is_dict){
                 $ret='d';
                 // this is required by the specs, and BitTornado actualy chokes on unsorted dictionaries
                 ksort($d, SORT_STRING);
